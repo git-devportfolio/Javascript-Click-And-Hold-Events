@@ -1,0 +1,82 @@
+<!doctype html>
+<html class="no-js" lang="">
+
+<head>
+  <meta charset="utf-8">
+  <title>Javascript Click And Hold Events</title>
+  <meta name="description" content="">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <style>
+  * {
+    margin:0;
+    padding:0;
+    box-sizing: border-box;
+    -webkit-user-select: none;
+  }
+  body {
+    text-align:center;
+    background:#FFCC;
+  }
+  button {
+    font-size:2rem; 
+    text-align:center; 
+  }
+  </style>
+</head>
+
+<body>
+  
+  <button id="btn">touch</button>
+  
+  <script>
+  class ClickAndHoldEvent {
+    /**
+     * @param {EventTarget} target The HTML element to apply the event to
+     * @param {Function} callback The function to run once the target is clicked and held
+     */
+    constructor (target, callback) {
+      this.target = target;
+      this.callback = callback;
+      this.isHeld = false;
+      this.activeIntervalId = null;
+      
+      ["mousedown", "touchstart"].forEach(type => {
+        this.target.addEventListener(type, this._onHoldStart.bind(this));
+      });
+      
+      ["mouseup", "mouseleave", "mouseout", "touchend", "touchcance]"].forEach(type => {
+        this.target.addEventListener(type, this._onHoldEnd.bind(this));
+      });
+    } 
+    
+    _onHoldStart() {
+      this.isHeld = true;
+      //console.log("_onHoldStart");
+      this.activeIntervalId = setInterval(() => { 
+        if(this.isHeld) {
+          this.callback();
+        }
+      }, 1000 / 60);
+    }
+    
+    _onHoldEnd() {
+      this.isHeld = false;
+      //console.log("_onHoldEnd");
+      clearInterval(this.activeIntervalId);
+    }
+    
+    static apply(target, callback) {
+      new ClickAndHoldEvent(target, callback);
+    }
+  } 
+  
+  var btn = document.getElementById("btn");
+  ClickAndHoldEvent.apply(btn, () => {
+    console.log("onHold");
+  });
+  </script>
+
+</body>
+
+</html>
